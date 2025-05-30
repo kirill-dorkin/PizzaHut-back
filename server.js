@@ -6,7 +6,9 @@ const app = express();
 const port = process.env.PORT || 3000;
 const path = require('path');
 
-app.use(cors());
+app.use(cors({
+  origin: 'https://pizza-hut-iota.vercel.app'
+}));
 app.use(bodyParser.json());
 
 app.post('/save-payment', (req, res) => {
