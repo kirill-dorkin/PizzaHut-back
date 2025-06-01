@@ -9,6 +9,7 @@ const path = require('path');
 app.use(cors({
   origin: 'https://pizza-hut-iota.vercel.app'
 }));
+// app.use(cors())
 app.use(bodyParser.json());
 
 app.post('/save-payment', (req, res) => {
@@ -21,7 +22,6 @@ app.post('/save-payment', (req, res) => {
   const lines = existing.trim() ? existing.trim().split('\n') : [];
   const entryNumber = lines.length + 1;
 
-  // Красивое время
   const now = new Date();
   const formattedTime = now.toISOString().replace('T', ' ').split('.')[0];
 
