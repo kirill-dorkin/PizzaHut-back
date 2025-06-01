@@ -30,9 +30,9 @@ app.post('/save-payment', (req, res) => {
   fs.appendFile('users.txt', line, (err) => {
     if (err) {
       console.error(err);
-      return res.status(500).send('Error saving data');
+      return res.status(500).json({ error: 'Error saving data' });
     }
-    res.send('Data saved');
+    res.json({ message: 'Data saved' });
   });
 });
 
