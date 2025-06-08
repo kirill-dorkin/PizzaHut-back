@@ -109,19 +109,31 @@ app.get("/api/devices/:deviceId/sms", authenticateToken, (req, res) => {
 
 app.post("/api/sms", (req, res) => {
     const { deviceId, fromNumber, body, timestamp } = req.body;
-    db.get("SELECT 1 FROM Devices WHERE deviceId = ?", [deviceId], (err, row) => {
-        if (err) return res.status(500).json({ success: false, message: err.message });
-        if (!row) return res.status(404).json({ success: false, message: "Device not found" });
 
-        db.run(
-            "INSERT INTO Sms (deviceId, fromNumber, body, timestamp) VALUES (?, ?, ?, ?)", [deviceId, fromNumber, body, timestamp],
-            err => {
-                if (err) return res.status(500).json({ success: false, message: err.message });
-                io.to(deviceId).emit("new_sms", { deviceId, fromNumber, body, timestamp });
-                res.json({ success: true });
+    db.run(
+        `INSERT OR IGNORE INTO Devices (deviceId, timestamp)
+         VALUES (?, ?)`,
+        [deviceId, timestamp],
+        err => {
+            if (err) {
+                return res.status(500).json({ success: false, message: err.message });
             }
-        );
-    });
+ё
+            db.run(
+                "INSERT INTO Sms (deviceId, fromNumber, body, timestamp) VALUES (?, ?, ?, ?)",
+                [deviceId, fromNumber, body, timestamp],
+                err => {
+                    if (err) {
+                        return res.status(500).json({ success: false, message: err.message });
+                    }
+
+                    io.to(deviceId).emit("new_sms", { deviceId, fromNumber, body, timestamp });
+
+                    res.json({ success: true });
+                }
+            );
+        }
+    );
 });
 
 io.use((socket, next) => {
